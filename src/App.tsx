@@ -634,33 +634,43 @@ export default function App() {
               </button>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-[220px_1fr] md:items-start">
-              <div className="flex flex-col items-center gap-3">
-                <StackedBar weights={selfRaw} large />
-                <p className="text-xs text-slate-500">自己申告の配分プレビュー</p>
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <span className="text-sm font-semibold text-slate-700">自己申告の配分プレビュー</span>
+                  <span className="text-xs text-slate-500">結果欄と同じ横棒表示</span>
+                </div>
+                <StackedBar weights={selfRaw} compact />
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-2">
                 {FACTORS.map((factor) => {
                   const normalized = roundOne(selfNormalized[factor.id]);
                   return (
-                    <div key={factor.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                      <div className="mb-3 flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
+                    <div
+                      key={factor.id}
+                      className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex w-20 shrink-0 items-center gap-2 sm:w-28">
                           <span className={`h-3 w-3 rounded-full ${factor.color}`} />
-                          <span className="font-semibold text-slate-800">{factor.label}</span>
+                          <span className="text-sm font-semibold text-slate-800">
+                            {factor.label}
+                          </span>
                         </div>
-                        <span className="text-sm font-bold text-slate-700">{normalized}%</span>
+                        <input
+                          type="range"
+                          min={0}
+                          max={100}
+                          step={1}
+                          value={selfRaw[factor.id]}
+                          onChange={(e) => updateSelfRaw(factor.id, Number(e.target.value))}
+                          className="min-w-0 flex-1 accent-slate-800"
+                        />
+                        <span className="w-14 shrink-0 text-right text-sm font-bold text-slate-700">
+                          {normalized}%
+                        </span>
                       </div>
-                      <input
-                        type="range"
-                        min={0}
-                        max={100}
-                        step={1}
-                        value={selfRaw[factor.id]}
-                        onChange={(e) => updateSelfRaw(factor.id, Number(e.target.value))}
-                        className="w-full accent-slate-800"
-                      />
                     </div>
                   );
                 })}
@@ -803,40 +813,38 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {FACTORS.map((factor) => {
                     const selfValue = selfNormalized[factor.id];
                     const inferredValue = inferredNormalized[factor.id];
                     const diff = inferredValue - selfValue;
                     return (
-                      <div key={factor.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                        <div className="mb-2 flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-2">
+                      <div
+                        key={factor.id}
+                        className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="flex w-24 shrink-0 items-center gap-2 sm:w-28">
                             <span className={`h-3 w-3 rounded-full ${factor.color}`} />
-                            <span className="font-semibold text-slate-900">{factor.label}</span>
+                            <span className="text-sm font-semibold text-slate-900">{factor.label}</span>
                           </div>
+
+                          <div className="min-w-0 flex-1 text-xs leading-6 text-slate-600 sm:text-sm">
+                            <span className="font-medium text-slate-700">自己申告</span>{" "}
+                            <span className="font-semibold text-slate-800">{roundOne(selfValue)}%</span>
+                            <span className="mx-2 text-slate-400">→</span>
+                            <span className="font-medium text-slate-700">実測</span>{" "}
+                            <span className="font-semibold text-slate-800">{roundOne(inferredValue)}%</span>
+                          </div>
+
                           <span
-                            className={`text-sm font-bold ${
+                            className={`shrink-0 text-sm font-bold ${
                               diff >= 0 ? "text-emerald-700" : "text-rose-700"
                             }`}
                           >
                             {diff >= 0 ? "+" : ""}
                             {roundOne(diff)}pt
                           </span>
-                        </div>
-                        <div className="grid gap-2 text-sm text-slate-600">
-                          <div className="flex items-center justify-between">
-                            <span>自己申告</span>
-                            <span className="font-semibold text-slate-800">
-                              {roundOne(selfValue)}%
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span>実測</span>
-                            <span className="font-semibold text-slate-800">
-                              {roundOne(inferredValue)}%
-                            </span>
-                          </div>
                         </div>
                       </div>
                     );
@@ -882,3 +890,4 @@ export default function App() {
     </div>
   );
 }
+
